@@ -5,6 +5,10 @@ from src.data_reader import read_json
 
 
 def create_objects(file_name: str = "products.json") -> List[Category]:
+    """Создает объекты категорий и товаров из данных JSON-файла.
+    Читает файл из папки data/, преобразует данные в объекты Category и Product, и возвращает список готовых категорий
+    с товарами. По умолчанию использует файл products.json."""
+
     data: List[Dict[str, Any]] = read_json(file_name)
     categories: List[Category] = []
     for category in data:
