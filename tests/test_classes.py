@@ -76,11 +76,11 @@ class TestCategory(unittest.TestCase):
     ],
 )
 def test_product_validation(
-        name: str,
-        description: str,
-        price: Any,
-        quantity: Any,
-        expected_error: Optional[Type[Exception]],
+    name: str,
+    description: str,
+    price: Any,
+    quantity: Any,
+    expected_error: Optional[Type[Exception]],
 ) -> None:
     """Тестирует валидацию в классе `Product`."""
     if expected_error:
@@ -111,8 +111,8 @@ def test_empty_category(empty_category: Category) -> None:
 
 
 def test_add_product_to_category(
-        empty_category: Category,
-        sample_product: Product,
+    empty_category: Category,
+    sample_product: Product,
 ) -> None:
     """Тест добавления продукта в категорию."""
     empty_category.add_product(sample_product)
@@ -146,9 +146,9 @@ def test_category_repr(sample_category: Category) -> None:
     ],
 )
 def test_category_products_counter(
-        sample_product: Product,
-        products_list: List[str],
-        expected_products_count: int,
+    sample_product: Product,
+    products_list: List[str],
+    expected_products_count: int,
 ) -> None:
     """
     Тест подсчёта общего количества товаров (products_count).
@@ -211,8 +211,8 @@ def test_getter_products(sample_category: Category) -> None:
     "product, expected",
     [
         (
-                {"name": "FreeBuds 5", "description": "Безпроводные наушники", "price": 5099.45, "quantity": 5},
-                "Безпроводные наушники",
+            {"name": "FreeBuds 5", "description": "Безпроводные наушники", "price": 5099.45, "quantity": 5},
+            "Безпроводные наушники",
         ),
         ({}, ValueError),
         (None, ValueError),
@@ -246,8 +246,9 @@ def test_price_setter(sample_product: Product, new_price: Any, final_price: floa
         (-1000, "Цена не должна быть нулевая или отрицательная"),
     ],
 )
-def test_price_setter_invalid_price(capsys: pytest.CaptureFixture[str], sample_product: Product, new_price: float,
-                                    message: str) -> None:
+def test_price_setter_invalid_price(
+    capsys: pytest.CaptureFixture[str], sample_product: Product, new_price: float, message: str
+) -> None:
     """Тест сеттера цены, тестирование вывода сообщения при установке невалидных цен"""
     sample_product.price = new_price
     assert capsys.readouterr().out.strip() == message
@@ -256,8 +257,9 @@ def test_price_setter_invalid_price(capsys: pytest.CaptureFixture[str], sample_p
 @pytest.mark.parametrize(
     "new_price, conformation, final_price", [(5000, "y", 5000), (500, "y", 500), (400, "n", 599.99)]
 )
-def test_price_setter_lower_price(sample_product: Product, new_price: float, conformation: str,
-                                  final_price: float) -> None:
+def test_price_setter_lower_price(
+    sample_product: Product, new_price: float, conformation: str, final_price: float
+) -> None:
     """Тест сеттера цены, тестирование подтверждения установки цены ниже существующей"""
     with patch("builtins.input", return_value=conformation):
         sample_product.price = new_price
@@ -271,7 +273,9 @@ def test_price_setter_lower_price(sample_product: Product, new_price: float, con
         ({"name": "Ноутбук", "description": "Игровой", "price": 10000, "quantity": 1}, 10000.00, 6),
     ],
 )
-def test_new_product_in_list(list_of_products: list[Product], new_product:dict[Any, Any], price_expected:float, quantity_expected:int) -> None:
+def test_new_product_in_list(
+    list_of_products: list[Product], new_product: dict[Any, Any], price_expected: float, quantity_expected: int
+) -> None:
     product_list = list_of_products
     product3 = Product.new_product(new_product, product_list)
     assert product3.quantity == quantity_expected
@@ -285,12 +289,12 @@ def test_new_product_in_list(list_of_products: list[Product], new_product:dict[A
         ({"name": "Ноутбук", "description": "Игровой", "price": 10000, "quantity": 1}, 10000.00, 1),
     ],
 )
-def test_new_product_in_list_empty(new_product:dict[Any, Any], price_expected:float, quantity_expected:int) -> None:
+def test_new_product_in_list_empty(new_product: dict[Any, Any], price_expected: float, quantity_expected: int) -> None:
     product_list1 = None
     product1 = Product.new_product(new_product, product_list1)
     assert product1.quantity == quantity_expected
     assert product1.price == price_expected
-    product_list2:list = []
+    product_list2: list = []
     product2 = Product.new_product(new_product, product_list2)
     assert product2.quantity == quantity_expected
     assert product2.price == price_expected
