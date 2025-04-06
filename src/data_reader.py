@@ -14,5 +14,5 @@ def read_json(file_name: str) -> List[Dict[str, Any]]:
     return data
 
 
-if __name__ == "__main__":
-    print(read_json("products.json"))
+# if __name__ == "__main__":
+#     print(read_json("products.json"))

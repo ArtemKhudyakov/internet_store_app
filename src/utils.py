@@ -20,30 +20,30 @@ def create_objects(file_name: str = "products.json") -> List[Category]:
     return categories
 
 
-if __name__ == "__main__":
-    objects = create_objects("products.json")
-    print(objects)
-    print(objects[0].name)
-    print(objects[0].description)
-    print(objects[0].products_list)
-
-    print(objects[1].name)
-    print(objects[1].description)
-    print(objects[1].products_list)
-    for product in objects[0].products_list:
-        print(
-            f"\nНаименование: {product.name}\nОписание: {product.description}"
-            f"\nЦена: {product.price}\nВ наличии: {product.quantity}"
-        )
-
-    for product in objects[1].products_list:
-        print(
-            f"\nНаименование: {product.name}\nОписание: {product.description}"
-            f"\nЦена: {product.price}\nВ наличии: {product.quantity}"
-        )
-
-    print(objects[0].product_count)
-    print(objects[1].product_count)
-
-    print(objects[0].category_count)
-    print(objects[1].category_count)
+# if __name__ == "__main__":
+#     objects = create_objects("products.json")
+#     print(objects)
+#     print(objects[0].name)
+#     print(objects[0].description)
+#     print(objects[0].products_list)
+#
+#     print(objects[1].name)
+#     print(objects[1].description)
+#     print(objects[1].products_list)
+#     for product in objects[0].products_list:
+#         print(
+#             f"\nНаименование: {product.name}\nОписание: {product.description}"
+#             f"\nЦена: {product.price}\nВ наличии: {product.quantity}"
+#         )
+#
+#     for product in objects[1].products_list:
+#         print(
+#             f"\nНаименование: {product.name}\nОписание: {product.description}"
+#             f"\nЦена: {product.price}\nВ наличии: {product.quantity}"
+#         )
+#
+#     print(objects[0].product_count)
+#     print(objects[1].product_count)
+#
+#     print(objects[0].category_count)
+#     print(objects[1].category_count)
