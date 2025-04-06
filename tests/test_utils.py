@@ -15,9 +15,9 @@ def test_create_objects_success(test_data_valid: List[Dict[str, Any]]) -> None:
 
         assert len(result) == 1
         assert isinstance(result[0], Category)
-        assert isinstance(result[0].products[0], Product)
+        assert isinstance(result[0].products_list[0], Product)
         assert result[0].name == "Тест"
-        assert result[0].products[0].name == "Товар"
+        assert result[0].products_list[0].name == "Товар"
 
 
 def test_create_objects_empty_file() -> None:
@@ -45,5 +45,5 @@ def test_create_objects_multiple_categories(test_data_multiple_categories: List[
         assert len(result) == 2
         assert result[0].name == "Категория 1"
         assert result[1].name == "Категория 2"
-        assert len(result[0].products) == 1
-        assert result[0].products[0].name == "Товар 1"
+        assert len(result[0].products_list) == 1
+        assert result[0].products_list[0].name == "Товар 1"

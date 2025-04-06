@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 from typing import Any, List, Optional, Type
 
 import pytest
@@ -41,18 +42,18 @@ class TestCategory(unittest.TestCase):
         products = [Product("Ноутбук", "Мощный ноутбук", 999.99, 5), Product("Мышь", "Беспроводная мышь", 49.99, 20)]
         category = Category("Компьютеры", "Компьютерная техника", products)
 
-        self.assertEqual(len(category.products), 2)
-        self.assertIsInstance(category.products[0], Product)
-        self.assertEqual(category.products[1].name, "Мышь")
+        self.assertEqual(len(category.products_list), 2)
+        self.assertIsInstance(category.products_list[0], Product)
+        self.assertEqual(category.products_list[1].name, "Мышь")
 
     def test_add_product_to_category(self) -> None:
         """Тест добавления продукта в категорию"""
         category = Category("Одежда", "Модная одежда")
         product = Product("Футболка", "Хлопковая футболка", 29.99, 50)
 
-        category.products.append(product)
-        self.assertEqual(len(category.products), 1)
-        self.assertEqual(category.products[0].name, "Футболка")
+        category.add_product(product)
+        self.assertEqual(len(category.products_list), 1)
+        self.assertEqual(category.products_list[0].name, "Футболка")
 
     def test_category_with_none_products(self) -> None:
         """Тест создания категории с products=None (должен создаваться пустой список)"""
@@ -75,11 +76,11 @@ class TestCategory(unittest.TestCase):
     ],
 )
 def test_product_validation(
-    name: str,
-    description: str,
-    price: Any,
-    quantity: Any,
-    expected_error: Optional[Type[Exception]],
+        name: str,
+        description: str,
+        price: Any,
+        quantity: Any,
+        expected_error: Optional[Type[Exception]],
 ) -> None:
     """Тестирует валидацию в классе `Product`."""
     if expected_error:
@@ -98,8 +99,8 @@ def test_category_initialization(sample_product: Product) -> None:
     category = Category("Электроника", "Гаджеты", [sample_product])
     assert category.name == "Электроника"
     assert category.description == "Гаджеты"
-    assert len(category.products) == 1
-    assert category.products[0] == sample_product
+    assert len(category.products_list) == 1
+    assert category.products_list[0] == sample_product
 
 
 def test_empty_category(empty_category: Category) -> None:
@@ -110,13 +111,13 @@ def test_empty_category(empty_category: Category) -> None:
 
 
 def test_add_product_to_category(
-    empty_category: Category,
-    sample_product: Product,
+        empty_category: Category,
+        sample_product: Product,
 ) -> None:
     """Тест добавления продукта в категорию."""
-    empty_category.products.append(sample_product)
-    assert len(empty_category.products) == 1
-    assert empty_category.products[0] == sample_product
+    empty_category.add_product(sample_product)
+    assert len(empty_category.products_list) == 1
+    assert empty_category.products_list[0] == sample_product
 
 
 def test_category_with_none_products() -> None:
@@ -145,9 +146,9 @@ def test_category_repr(sample_category: Category) -> None:
     ],
 )
 def test_category_products_counter(
-    sample_product: Product,
-    products_list: List[str],
-    expected_products_count: int,
+        sample_product: Product,
+        products_list: List[str],
+        expected_products_count: int,
 ) -> None:
     """
     Тест подсчёта общего количества товаров (products_count).
@@ -182,3 +183,62 @@ def test_multiple_categories_and_products(sample_product: Product, another_produ
     assert cat2.name == "Одежда"
     assert Category.category_count == 2
     assert Category.product_count == 3  # 2 + 1 товар
+
+
+def test_getter_products_list(sample_product: Product, another_product: Product) -> None:
+    """Тест получения списка товаров"""
+    cat1 = Category('тест', 'тестирование', [sample_product, another_product])
+    assert len(cat1.products_list) == 2
+    assert cat1.products_list[0] == sample_product
+    assert cat1.products_list[1] == another_product
+
+
+def test_add_product(sample_product: Product, another_product) -> None:
+    """Тест добавления товара в категорию"""
+    cat1 = Category('тест', 'тестирование', [sample_product])
+    assert len(cat1.products_list) == 1
+    cat1.add_product(another_product)
+    assert len(cat1.products_list) == 2
+    assert cat1.products_list[1] == another_product
+
+
+def test_getter_products(sample_category: Category) -> None:
+    """Тест получения строки из списка товаров"""
+    assert sample_category.products == "Телефон, 599.99 руб. Остаток: 10\n"
+
+
+@pytest.mark.parametrize("product, expected", [({'name': 'FreeBuds 5', 'description': 'Безпроводные наушники',
+                                                 'price': 5099.45, 'quantity': 5}, 'Безпроводные наушники'),
+                                               ({}, ValueError), (None, ValueError), ([], ValueError)])
+def test_new_product(product: dict[str, Any], expected: Any) -> None:
+    """Тест создания нового товара"""
+    if expected != ValueError:
+        product1 = Product.new_product(product)
+        assert product1.description == expected
+    else:
+        with pytest.raises(expected):
+            Product.new_product(product)
+
+
+@pytest.mark.parametrize('new_price, final_price',
+                         [("Тысяча", 599.99), (-1000, 599.99), (0, 599.99), (1000.00, 1000.00)])
+def test_price_setter(sample_product: Product, new_price: Any, final_price: float) -> None:
+    sample_product.price = new_price
+    assert sample_product.price == final_price
+
+
+@pytest.mark.parametrize('new_price, message', [(0, "Цена не должна быть нулевая или отрицательная"),
+                                                ('qwerty', "Неверный формат ввода"),
+                                                (-1000, "Цена не должна быть нулевая или отрицательная")])
+def test_price_setter_invalid_price(capsys, sample_product, new_price, message) -> None:
+    sample_product.price = new_price
+    assert capsys.readouterr().out.strip() == message
+
+
+@pytest.mark.parametrize('new_price, conformation, final_price', [(5000, 'y', 5000), (500, 'y', 500), (400, 'n', 599.99)])
+def test_price_setter_lower_price(sample_product: Product, new_price, conformation, final_price) -> None:
+    with patch('builtins.input', return_value= conformation):
+        sample_product.price = new_price
+        assert sample_product.price == final_price
+
+

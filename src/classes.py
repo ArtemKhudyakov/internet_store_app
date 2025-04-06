@@ -13,7 +13,7 @@ class Product:
 
         if not isinstance(price, (int, float)) or price < 0:
             raise ValueError("Цена должна быть положительным числом")
-        self.price = float(price)
+        self.__price = float(price)
 
         if not isinstance(quantity, int) or quantity < 0:
             raise ValueError("Количество должно быть целым неотрицательным числом")
@@ -21,6 +21,39 @@ class Product:
 
     def __repr__(self) -> str:
         return f"Product(name='{self.name}', price={self.price}, quantity={self.quantity})"
+
+    @classmethod
+    def new_product(cls, data: dict) -> 'Product':
+        if not isinstance(data, dict):
+            raise ValueError("Неверный формат")
+        elif data == {} or data == None:
+            raise ValueError("Продукт не может быть пустым")
+        product = Product(**data)
+        return product
+
+    @property
+    def price(self) -> float:
+        return self.__price
+
+    @price.setter
+    def price(self, new_price: float) -> None:
+        if not isinstance(new_price, (int, float)):
+            print("Неверный формат ввода")
+            return
+        elif new_price <= 0:
+            print("Цена не должна быть нулевая или отрицательная")
+            return
+        else:
+            if new_price < self.__price:
+                conformation = (input("""Подтвердите понижение цены! y - да
+                           n - нет
+                           ----->""")).lower()
+                if conformation == "y":
+                    self.__price = new_price
+                else:
+                    return
+            else:
+                self.__price = new_price
 
 
 class Category:
@@ -33,20 +66,66 @@ class Category:
     def __init__(self, name: str, description: str, products: Optional[List[Product]] = None):
         self.name = name
         self.description = description
-        self.products = products if products is not None else []
+        self.__products = products if products is not None else []
         Category.category_count += 1
-        Category.product_count += len(self.products)
+        Category.product_count += len(self.__products)
 
     def __repr__(self) -> str:
-        return f"Category(name='{self.name}', products={len(self.products)})"
+        return f"Category(name='{self.name}', products={len(self.products_list)})"
+
+    @property
+    def products_list(self) -> List[Product]:
+        return self.__products
+
+    @property
+    def products(self) -> str:
+        products_str = ''
+        for product in self.__products:
+            products_str += f'{product.name}, {product.price} руб. Остаток: {product.quantity}\n'
+        return products_str
+
+    def add_product(self, product: Product):
+        self.__products.append(product)
+        Category.product_count += 1
 
 
-# if __name__ == "__main__":
-#     category1 = Category("Electronic", "Eectronic devices")
-#     product1 = Product("Laptop", "Powerful laptop", 999.99, 5)
-#     product2 = Product("Phone", "Smartphone", 699.99, 10)
-#     category1.products.append(product1)
-#     category1.products.append(product2)
-#     print(category1.products)
-#     for product in category1.products:
-#         print(product.name, product.description)
+if __name__ == "__main__":
+    category1 = Category("Electronic", "Eectronic devices")
+    product1 = Product("Laptop", "Powerful laptop", 999.99, 5)
+    product2 = Product("Phone", "Smartphone", 699.99, 10)
+    category1.add_product(product1)
+    category1.add_product(product2)
+    print(category1.products)
+    for product in category1.products_list:
+        print(product.name, product.description)
+
+    print(category1.product_count)
+
+if __name__ == "__main__":
+    new_product = {'name': 'FreeBuds 5', 'description': 'Безпроводные наушники', 'price': 5099.45, 'quantity': 5}
+
+    product3 = Product.new_product(new_product)
+
+    print(product3.name, product3.description, product3.price, product3.quantity)
+
+    try:
+        product4 = Product.new_product(['FreeBuds 5', 'Безпроводные наушники', 5099.45, 5])
+    except Exception as e:
+        print(e)
+    try:
+        print(product4.name, product4.description, product4.price, product4.quantity)
+    except Exception as e:
+        print(e)
+
+    product3.price = 7099.45
+
+    print(product3)
+
+    product3.price = -2332.454
+    print(product3)
+
+    product3.price = 'dfd'
+    print(product3)
+
+    product3.price = 6099.45
+    print(product3)
