@@ -1,6 +1,6 @@
 import unittest
-from unittest.mock import patch
 from typing import Any, List, Optional, Type
+from unittest.mock import patch
 
 import pytest
 
@@ -187,15 +187,15 @@ def test_multiple_categories_and_products(sample_product: Product, another_produ
 
 def test_getter_products_list(sample_product: Product, another_product: Product) -> None:
     """Тест получения списка товаров"""
-    cat1 = Category('тест', 'тестирование', [sample_product, another_product])
+    cat1 = Category("тест", "тестирование", [sample_product, another_product])
     assert len(cat1.products_list) == 2
     assert cat1.products_list[0] == sample_product
     assert cat1.products_list[1] == another_product
 
 
-def test_add_product(sample_product: Product, another_product) -> None:
+def test_add_product(sample_product: Product, another_product: Product) -> None:
     """Тест добавления товара в категорию"""
-    cat1 = Category('тест', 'тестирование', [sample_product])
+    cat1 = Category("тест", "тестирование", [sample_product])
     assert len(cat1.products_list) == 1
     cat1.add_product(another_product)
     assert len(cat1.products_list) == 2
@@ -207,9 +207,18 @@ def test_getter_products(sample_category: Category) -> None:
     assert sample_category.products == "Телефон, 599.99 руб. Остаток: 10\n"
 
 
-@pytest.mark.parametrize("product, expected", [({'name': 'FreeBuds 5', 'description': 'Безпроводные наушники',
-                                                 'price': 5099.45, 'quantity': 5}, 'Безпроводные наушники'),
-                                               ({}, ValueError), (None, ValueError), ([], ValueError)])
+@pytest.mark.parametrize(
+    "product, expected",
+    [
+        (
+                {"name": "FreeBuds 5", "description": "Безпроводные наушники", "price": 5099.45, "quantity": 5},
+                "Безпроводные наушники",
+        ),
+        ({}, ValueError),
+        (None, ValueError),
+        ([], ValueError),
+    ],
+)
 def test_new_product(product: dict[str, Any], expected: Any) -> None:
     """Тест создания нового товара"""
     if expected != ValueError:
@@ -220,52 +229,68 @@ def test_new_product(product: dict[str, Any], expected: Any) -> None:
             Product.new_product(product)
 
 
-@pytest.mark.parametrize('new_price, final_price',
-                         [("Тысяча", 599.99), (-1000, 599.99), (0, 599.99), (1000.00, 1000.00)])
+@pytest.mark.parametrize(
+    "new_price, final_price", [("Тысяча", 599.99), (-1000, 599.99), (0, 599.99), (1000.00, 1000.00)]
+)
 def test_price_setter(sample_product: Product, new_price: Any, final_price: float) -> None:
     """Тест сеттера цены, тестирование возврата правильной цены при установке валидных и невалидных цен"""
     sample_product.price = new_price
     assert sample_product.price == final_price
 
 
-@pytest.mark.parametrize('new_price, message', [(0, "Цена не должна быть нулевая или отрицательная"),
-                                                ('qwerty', "Неверный формат ввода"),
-                                                (-1000, "Цена не должна быть нулевая или отрицательная")])
-def test_price_setter_invalid_price(capsys, sample_product, new_price, message) -> None:
+@pytest.mark.parametrize(
+    "new_price, message",
+    [
+        (0, "Цена не должна быть нулевая или отрицательная"),
+        ("qwerty", "Неверный формат ввода"),
+        (-1000, "Цена не должна быть нулевая или отрицательная"),
+    ],
+)
+def test_price_setter_invalid_price(capsys: pytest.CaptureFixture[str], sample_product: Product, new_price: float,
+                                    message: str) -> None:
     """Тест сеттера цены, тестирование вывода сообщения при установке невалидных цен"""
     sample_product.price = new_price
     assert capsys.readouterr().out.strip() == message
 
 
-@pytest.mark.parametrize('new_price, conformation, final_price',
-                         [(5000, 'y', 5000), (500, 'y', 500), (400, 'n', 599.99)])
-def test_price_setter_lower_price(sample_product: Product, new_price, conformation, final_price) -> None:
+@pytest.mark.parametrize(
+    "new_price, conformation, final_price", [(5000, "y", 5000), (500, "y", 500), (400, "n", 599.99)]
+)
+def test_price_setter_lower_price(sample_product: Product, new_price: float, conformation: str,
+                                  final_price: float) -> None:
     """Тест сеттера цены, тестирование подтверждения установки цены ниже существующей"""
-    with patch('builtins.input', return_value=conformation):
+    with patch("builtins.input", return_value=conformation):
         sample_product.price = new_price
         assert sample_product.price == final_price
 
 
-@pytest.mark.parametrize('new_product, price_expected, quantity_expected',
-                         [({'name': "Ноутбук", 'description': "Игровой",
-                            'price': 10, 'quantity': 20}, 999.99, 25), ({'name': "Ноутбук", 'description': "Игровой",
-                                                                         'price': 10000, 'quantity': 1}, 10000.00, 6)])
-def test_new_product_in_list(list_of_products: list[Product], new_product, price_expected, quantity_expected) -> None:
+@pytest.mark.parametrize(
+    "new_product, price_expected, quantity_expected",
+    [
+        ({"name": "Ноутбук", "description": "Игровой", "price": 10, "quantity": 20}, 999.99, 25),
+        ({"name": "Ноутбук", "description": "Игровой", "price": 10000, "quantity": 1}, 10000.00, 6),
+    ],
+)
+def test_new_product_in_list(list_of_products: list[Product], new_product:dict[Any, Any], price_expected:float, quantity_expected:int) -> None:
     product_list = list_of_products
     product3 = Product.new_product(new_product, product_list)
     assert product3.quantity == quantity_expected
     assert product3.price == price_expected
 
 
-@pytest.mark.parametrize('new_product, price_expected, quantity_expected',
-                         [({'name': "Ноутбук", 'description': "Игровой", 'price': 10, 'quantity': 20}, 10, 20),
-                          ({'name': "Ноутбук", 'description': "Игровой", 'price': 10000, 'quantity': 1}, 10000.00, 1)])
-def test_new_product_in_list_empty(new_product, price_expected, quantity_expected) -> None:
+@pytest.mark.parametrize(
+    "new_product, price_expected, quantity_expected",
+    [
+        ({"name": "Ноутбук", "description": "Игровой", "price": 10, "quantity": 20}, 10, 20),
+        ({"name": "Ноутбук", "description": "Игровой", "price": 10000, "quantity": 1}, 10000.00, 1),
+    ],
+)
+def test_new_product_in_list_empty(new_product:dict[Any, Any], price_expected:float, quantity_expected:int) -> None:
     product_list1 = None
     product1 = Product.new_product(new_product, product_list1)
     assert product1.quantity == quantity_expected
     assert product1.price == price_expected
-    product_list2 = []
+    product_list2:list = []
     product2 = Product.new_product(new_product, product_list2)
     assert product2.quantity == quantity_expected
     assert product2.price == price_expected

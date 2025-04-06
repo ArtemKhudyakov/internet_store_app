@@ -2,10 +2,10 @@ from typing import List, Optional
 
 
 class Product:
-    name: str
-    description: str
-    price: float
-    quantity: int
+    # name: str
+    # description: str
+    # price: float
+    # quantity: int
 
     def __init__(self, name: str, description: str, price: float, quantity: int):
         self.name = name
@@ -23,10 +23,10 @@ class Product:
         return f"Product(name='{self.name}', price={self.price}, quantity={self.quantity})"
 
     @classmethod
-    def new_product(cls, data: dict, products_list: List['Product'] = None) -> 'Product':
+    def new_product(cls, data: dict, products_list: Optional[List["Product"]] = None) -> "Product":
         if not isinstance(data, dict):
             raise ValueError("Неверный формат")
-        elif data == {} or data == None:
+        elif data == {} or data is None:
             raise ValueError("Продукт не может быть пустым")
         else:
             product = Product(**data)
@@ -55,9 +55,13 @@ class Product:
             return
         else:
             if new_price < self.__price:
-                conformation = (input("""Подтвердите понижение цены! y - да
+                conformation = (
+                    input(
+                        """Подтвердите понижение цены! y - да
                            n - нет
-                           ----->""")).lower()
+                           ----->"""
+                    )
+                ).lower()
                 if conformation == "y":
                     self.__price = new_price
                 else:
@@ -67,9 +71,9 @@ class Product:
 
 
 class Category:
-    name: str
-    description: str
-    products: List[Product]
+    # name: str
+    # description: str
+    # products: List[Product]
     category_count: int = 0
     product_count: int = 0
 
@@ -89,12 +93,12 @@ class Category:
 
     @property
     def products(self) -> str:
-        products_str = ''
+        products_str = ""
         for product in self.__products:
-            products_str += f'{product.name}, {product.price} руб. Остаток: {product.quantity}\n'
+            products_str += f"{product.name}, {product.price} руб. Остаток: {product.quantity}\n"
         return products_str
 
-    def add_product(self, product: Product):
+    def add_product(self, product: Product)->None:
         self.__products.append(product)
         Category.product_count += 1
 
@@ -160,4 +164,3 @@ class Category:
 #
 # for prod in product_list:
 #     print(prod)
-
