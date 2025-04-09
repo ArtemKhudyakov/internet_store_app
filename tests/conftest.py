@@ -71,3 +71,9 @@ def test_data_multiple_categories() -> List[Dict[str, Any]]:
         },
     ]
     return test_data_multiple_categories
+
+
+@pytest.fixture
+def list_of_products(sample_product: Product, another_product: Product) -> List[Product]:
+    list_of_products = [sample_product, another_product]
+    return list_of_products
