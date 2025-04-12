@@ -325,8 +325,7 @@ def test_str_view_of_product(product: dict, expected_str: str) -> None:
             Category(
                 "Electronics",
                 "Electronic devices",
-                [Product("Телефон", "Смартфон", 599.99, 10),
-                 Product("Ноутбук", "Игровой", 999.99, 5)],
+                [Product("Телефон", "Смартфон", 599.99, 10), Product("Ноутбук", "Игровой", 999.99, 5)],
             ),
             "Electronics, количество продуктов: 15 шт.",
         )
@@ -352,3 +351,9 @@ def test_count_items_in_category(sample_category: Category) -> None:
     assert len(cat.products_list) == 2
     assert cat.quantity_of_items_in_category == 35
     assert cat.products_list[1].price == 5099.45
+
+
+def test_sum_of_whole_cost_of_two_products(list_of_products2: List[Product]) -> None:
+    assert list_of_products2[0] + list_of_products2[1] == 2580000
+    assert list_of_products2[1] + list_of_products2[2] == 2114000
+    assert list_of_products2[2] + list_of_products2[0] == 1334000

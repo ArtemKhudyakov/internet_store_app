@@ -25,6 +25,11 @@ class Product:
     def __str__(self) -> str:
         return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
+    def __add__(self, other: 'Product') -> float:
+
+        summa = self.__price * self.quantity + other.__price * other.quantity
+        return summa
+
     @classmethod
     def new_product(cls, data: dict, products_list: Optional[List["Product"]] = None) -> "Product":
         if not isinstance(data, dict):
@@ -181,38 +186,38 @@ class Category:
 #
 # for prod in product_list:
 #     print(prod)
-
-if __name__ == "__main__":
-    initial_product_list1 = [Product("Телефон", "Смартфон", 599.99, 10), Product("Ноутбук", "Игровой", 999.99, 5)]
-
-    category1 = Category("Electronics", "Electronic devices", products=initial_product_list1)
-
-    product3 = Product.new_product({"name": "Ноутбук", "description": "Игровой", "price": 10, "quantity": 20})
-
-    product4 = Product.new_product(
-        {"name": "FreeBuds 5", "description": "Безпроводные наушники", "price": 5099.45, "quantity": 5}
-    )
-
-    category1.add_product(product3)
-    category1.add_product(product4)
-
-    initial_product_list2 = [
-        Product("Товар 1", "Описание товара 1", 100, 1),
-        Product("Товар 2", "Описание товара 2", 200, 2),
-    ]
-
-    category2 = Category("Тест", "Тестовая категоря", products=initial_product_list2)
-
-    test_product = Product.new_product(
-        {"name": "Товар 3", "description": "Описание товара 3", "price": 300, "quantity": 3}
-    )
-    category2.add_product(test_product)
-
-    for prod in category1.products_list:
-        print(prod)
-
-    print("####")
-
-    print(category1)
-
-    print(category2)
+#
+# if __name__ == "__main__":
+#     initial_product_list1 = [Product("Телефон", "Смартфон", 599.99, 10), Product("Ноутбук", "Игровой", 999.99, 5)]
+#
+#     category1 = Category("Electronics", "Electronic devices", products=initial_product_list1)
+#
+#     product3 = Product.new_product({"name": "Ноутбук", "description": "Игровой", "price": 10, "quantity": 20})
+#
+#     product4 = Product.new_product(
+#         {"name": "FreeBuds 5", "description": "Безпроводные наушники", "price": 5099.45, "quantity": 5}
+#     )
+#
+#     category1.add_product(product3)
+#     category1.add_product(product4)
+#
+#     initial_product_list2 = [
+#         Product("Товар 1", "Описание товара 1", 100, 1),
+#         Product("Товар 2", "Описание товара 2", 200, 2),
+#     ]
+#
+#     category2 = Category("Тест", "Тестовая категоря", products=initial_product_list2)
+#
+#     test_product = Product.new_product(
+#         {"name": "Товар 3", "description": "Описание товара 3", "price": 300, "quantity": 3}
+#     )
+#     category2.add_product(test_product)
+#
+#     for prod in category1.products_list:
+#         print(prod)
+#
+#     print("####")
+#
+#     print(category1)
+#
+#     print(category2)

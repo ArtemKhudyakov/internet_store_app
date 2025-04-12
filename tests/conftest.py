@@ -77,3 +77,12 @@ def test_data_multiple_categories() -> List[Dict[str, Any]]:
 def list_of_products(sample_product: Product, another_product: Product) -> List[Product]:
     list_of_products = [sample_product, another_product]
     return list_of_products
+
+
+@pytest.fixture
+def list_of_products2() -> List[Product]:
+    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+    product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
+    list_of_products = [product1, product2, product3]
+    return list_of_products
