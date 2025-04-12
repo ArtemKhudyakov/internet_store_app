@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Iterator, List, Optional
 
 
 class Product:
@@ -7,7 +7,7 @@ class Product:
     # price: float
     # quantity: int
 
-    def __init__(self, name: str, description: str, price: float, quantity: int):
+    def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         self.name = name
         self.description = description
 
@@ -25,7 +25,7 @@ class Product:
     def __str__(self) -> str:
         return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
-    def __add__(self, other: 'Product') -> float:
+    def __add__(self, other: "Product") -> float:
 
         summa = self.__price * self.quantity + other.__price * other.quantity
         return summa
@@ -85,7 +85,7 @@ class Category:
     category_count: int = 0
     product_count: int = 0
 
-    def __init__(self, name: str, description: str, products: Optional[List[Product]] = None):
+    def __init__(self, name: str, description: str, products: Optional[List[Product]] = None) -> None:
         self.name = name
         self.description = description
         self.__products = products if products is not None else []
@@ -123,6 +123,24 @@ class Category:
             self.__products.append(product)
             Category.product_count += 1
             self.quantity_of_items_in_category += product.quantity
+
+
+class CatIter:
+    def __init__(self, category: Category) -> None:
+        self.category = category
+        self.index = 0
+
+    def __iter__(self) -> Iterator[Product]:
+        self.index = 0
+        return self
+
+    def __next__(self) -> Product:
+        if self.index < len(self.category.products_list):
+            product = self.category.products_list[self.index]
+            self.index += 1
+            return product
+        else:
+            raise StopIteration
 
 
 # if __name__ == "__main__":
@@ -221,3 +239,19 @@ class Category:
 #     print(category1)
 #
 #     print(category2)
+#
+#     print("###")
+#
+#     for prod in CatIter(category1):
+#         print(prod)
+#
+#     print("\nповтор\n")
+#     iter_cat1 = CatIter(category1)
+#     print(next(iter_cat1))
+#     print(next(iter_cat1))
+#     print(next(iter_cat1))
+#
+#     print("###")
+#
+#     for prod in CatIter(category2):
+#         print(prod)
