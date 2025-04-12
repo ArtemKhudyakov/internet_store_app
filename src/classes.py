@@ -22,6 +22,9 @@ class Product:
     def __repr__(self) -> str:
         return f"Product(name='{self.name}', price={self.price}, quantity={self.quantity})"
 
+    def __str__(self) -> str:
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
     @classmethod
     def new_product(cls, data: dict, products_list: Optional[List["Product"]] = None) -> "Product":
         if not isinstance(data, dict):
@@ -83,6 +86,10 @@ class Category:
         self.__products = products if products is not None else []
         Category.category_count += 1
         Category.product_count += len(self.__products)
+        self.quantity_of_items_in_category = sum([product.quantity for product in self.__products])
+
+    def __str__(self) -> str:
+        return f"{self.name}, количество продуктов: {self.quantity_of_items_in_category} шт."
 
     def __repr__(self) -> str:
         return f"Category(name='{self.name}', products={len(self.products_list)})"
@@ -95,12 +102,22 @@ class Category:
     def products(self) -> str:
         products_str = ""
         for product in self.__products:
-            products_str += f"{product.name}, {product.price} руб. Остаток: {product.quantity}\n"
+            products_str += f"{str(product)}\n"
         return products_str
 
     def add_product(self, product: Product) -> None:
-        self.__products.append(product)
-        Category.product_count += 1
+        name_list = [prd.name for prd in self.__products]
+        if product.name in name_list:
+            for prd in self.__products:
+                if prd.name == product.name:
+                    prd.quantity += product.quantity
+                    self.quantity_of_items_in_category += product.quantity
+                    if product.price > prd.price:
+                        prd.price = product.price
+        else:
+            self.__products.append(product)
+            Category.product_count += 1
+            self.quantity_of_items_in_category += product.quantity
 
 
 # if __name__ == "__main__":
@@ -164,3 +181,38 @@ class Category:
 #
 # for prod in product_list:
 #     print(prod)
+
+if __name__ == "__main__":
+    initial_product_list1 = [Product("Телефон", "Смартфон", 599.99, 10), Product("Ноутбук", "Игровой", 999.99, 5)]
+
+    category1 = Category("Electronics", "Electronic devices", products=initial_product_list1)
+
+    product3 = Product.new_product({"name": "Ноутбук", "description": "Игровой", "price": 10, "quantity": 20})
+
+    product4 = Product.new_product(
+        {"name": "FreeBuds 5", "description": "Безпроводные наушники", "price": 5099.45, "quantity": 5}
+    )
+
+    category1.add_product(product3)
+    category1.add_product(product4)
+
+    initial_product_list2 = [
+        Product("Товар 1", "Описание товара 1", 100, 1),
+        Product("Товар 2", "Описание товара 2", 200, 2),
+    ]
+
+    category2 = Category("Тест", "Тестовая категоря", products=initial_product_list2)
+
+    test_product = Product.new_product(
+        {"name": "Товар 3", "description": "Описание товара 3", "price": 300, "quantity": 3}
+    )
+    category2.add_product(test_product)
+
+    for prod in category1.products_list:
+        print(prod)
+
+    print("####")
+
+    print(category1)
+
+    print(category2)

@@ -204,7 +204,7 @@ def test_add_product(sample_product: Product, another_product: Product) -> None:
 
 def test_getter_products(sample_category: Category) -> None:
     """Тест получения строки из списка товаров"""
-    assert sample_category.products == "Телефон, 599.99 руб. Остаток: 10\n"
+    assert sample_category.products == "Телефон, 599.99 руб. Остаток: 10 шт.\n"
 
 
 @pytest.mark.parametrize(
@@ -298,3 +298,57 @@ def test_new_product_in_list_empty(new_product: dict[Any, Any], price_expected: 
     product2 = Product.new_product(new_product, product_list2)
     assert product2.quantity == quantity_expected
     assert product2.price == price_expected
+
+
+@pytest.mark.parametrize(
+    "product, expected_str",
+    [
+        (
+            {"name": "Ноутбук", "description": "Игровой", "price": 10, "quantity": 20},
+            "Ноутбук, 10.0 руб. Остаток: 20 шт.",
+        ),
+        (
+            {"name": "FreeBuds 5", "description": "Безпроводные наушники", "price": 5099.45, "quantity": 5},
+            "FreeBuds 5, 5099.45 руб. Остаток: 5 шт.",
+        ),
+    ],
+)
+def test_str_view_of_product(product: dict, expected_str: str) -> None:
+    prd = Product.new_product(product)
+    assert str(prd) == expected_str
+
+
+@pytest.mark.parametrize(
+    "category, expected_str",
+    [
+        (
+            Category(
+                "Electronics",
+                "Electronic devices",
+                [Product("Телефон", "Смартфон", 599.99, 10),
+                 Product("Ноутбук", "Игровой", 999.99, 5)],
+            ),
+            "Electronics, количество продуктов: 15 шт.",
+        )
+    ],
+)
+def test_str_view_of_category(category: dict, expected_str: str) -> None:
+    cat = category
+    assert str(cat) == expected_str
+
+
+def test_count_items_in_category(sample_category: Category) -> None:
+    cat = sample_category
+    assert cat.quantity_of_items_in_category == 10
+    new_prod1 = Product("Телефон", "Смартфон", 799.99, 20)
+    cat.add_product(new_prod1)
+    assert len(cat.products_list) == 1
+    assert cat.quantity_of_items_in_category == 30
+    assert cat.products_list[0].price == 799.99
+    new_prod2 = Product.new_product(
+        {"name": "FreeBuds 5", "description": "Безпроводные наушники", "price": 5099.45, "quantity": 5}
+    )
+    cat.add_product(new_prod2)
+    assert len(cat.products_list) == 2
+    assert cat.quantity_of_items_in_category == 35
+    assert cat.products_list[1].price == 5099.45
