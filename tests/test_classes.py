@@ -328,8 +328,7 @@ def test_str_view_of_product(product: dict, expected_str: str) -> None:
             Category(
                 "Electronics",
                 "Electronic devices",
-                [Product("Телефон", "Смартфон", 599.99, 10),
-                 Product("Ноутбук", "Игровой", 999.99, 5)],
+                [Product("Телефон", "Смартфон", 599.99, 10), Product("Ноутбук", "Игровой", 999.99, 5)],
             ),
             "Electronics, количество продуктов: 15 шт.",
         )
