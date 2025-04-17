@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.classes import Category, Product
+from src.classes import Category, CatIter, Product
 
 
 class TestProduct(unittest.TestCase):
@@ -204,7 +204,7 @@ def test_add_product(sample_product: Product, another_product: Product) -> None:
 
 def test_getter_products(sample_category: Category) -> None:
     """Тест получения строки из списка товаров"""
-    assert sample_category.products == "Телефон, 599.99 руб. Остаток: 10\n"
+    assert sample_category.products == "Телефон, 599.99 руб. Остаток: 10 шт.\n"
 
 
 @pytest.mark.parametrize(
@@ -276,6 +276,7 @@ def test_price_setter_lower_price(
 def test_new_product_in_list(
     list_of_products: list[Product], new_product: dict[Any, Any], price_expected: float, quantity_expected: int
 ) -> None:
+    """Тест добавления в список продукта с таким же именем"""
     product_list = list_of_products
     product3 = Product.new_product(new_product, product_list)
     assert product3.quantity == quantity_expected
@@ -290,6 +291,7 @@ def test_new_product_in_list(
     ],
 )
 def test_new_product_in_list_empty(new_product: dict[Any, Any], price_expected: float, quantity_expected: int) -> None:
+    """Тест на добавление продукта в пустой список"""
     product_list1 = None
     product1 = Product.new_product(new_product, product_list1)
     assert product1.quantity == quantity_expected
@@ -298,3 +300,88 @@ def test_new_product_in_list_empty(new_product: dict[Any, Any], price_expected: 
     product2 = Product.new_product(new_product, product_list2)
     assert product2.quantity == quantity_expected
     assert product2.price == price_expected
+
+
+@pytest.mark.parametrize(
+    "product, expected_str",
+    [
+        (
+            {"name": "Ноутбук", "description": "Игровой", "price": 10, "quantity": 20},
+            "Ноутбук, 10.0 руб. Остаток: 20 шт.",
+        ),
+        (
+            {"name": "FreeBuds 5", "description": "Безпроводные наушники", "price": 5099.45, "quantity": 5},
+            "FreeBuds 5, 5099.45 руб. Остаток: 5 шт.",
+        ),
+    ],
+)
+def test_str_view_of_product(product: dict, expected_str: str) -> None:
+    """Тест строкового отображения продукта"""
+    prd = Product.new_product(product)
+    assert str(prd) == expected_str
+
+
+@pytest.mark.parametrize(
+    "category, expected_str",
+    [
+        (
+            Category(
+                "Electronics",
+                "Electronic devices",
+                [Product("Телефон", "Смартфон", 599.99, 10),
+                 Product("Ноутбук", "Игровой", 999.99, 5)],
+            ),
+            "Electronics, количество продуктов: 15 шт.",
+        )
+    ],
+)
+def test_str_view_of_category(category: dict, expected_str: str) -> None:
+    """Тест строкового отображения категории"""
+    cat = category
+    assert str(cat) == expected_str
+
+
+def test_count_items_in_category(sample_category: Category) -> None:
+    """Тест на объединение одинаковых товаров при добавлении в категорию"""
+    cat = sample_category
+    assert cat.quantity_of_items_in_category == 10
+    new_prod1 = Product("Телефон", "Смартфон", 799.99, 20)
+    cat.add_product(new_prod1)
+    assert len(cat.products_list) == 1
+    assert cat.quantity_of_items_in_category == 30
+    assert cat.products_list[0].price == 799.99
+    new_prod2 = Product.new_product(
+        {"name": "FreeBuds 5", "description": "Безпроводные наушники", "price": 5099.45, "quantity": 5}
+    )
+    cat.add_product(new_prod2)
+    assert len(cat.products_list) == 2
+    assert cat.quantity_of_items_in_category == 35
+    assert cat.products_list[1].price == 5099.45
+
+
+def test_sum_of_whole_cost_of_two_products(list_of_products2: List[Product]) -> None:
+    """Тест суммирования продуктов"""
+    assert list_of_products2[0] + list_of_products2[1] == 2580000
+    assert list_of_products2[1] + list_of_products2[2] == 2114000
+    assert list_of_products2[2] + list_of_products2[0] == 1334000
+
+
+def test_iterator_with_1_product(sample_category: Category) -> None:
+    """Тест итератора на категории с одним товаром"""
+    iter_1 = CatIter(sample_category)
+    assert iter_1.index == 0
+    assert str(next(iter_1)) == str(Product("Телефон", "Смартфон", 599.99, 10))
+    assert iter_1.index == 1
+    with pytest.raises(StopIteration):
+        next(iter_1)
+
+
+def test_iterator_with_2_products(sample_category: Category, another_product: Product) -> None:
+    """Тест итератора после добавления в категорию нового товара"""
+    cat = sample_category
+    cat.add_product(another_product)
+    iter_1 = CatIter(sample_category)
+    next(iter_1)
+    assert str(next(iter_1)) == str(another_product)
+    with pytest.raises(StopIteration):
+        next(iter_1)
