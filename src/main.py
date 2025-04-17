@@ -1,4 +1,5 @@
-from src.classes import Category, LawnGrass, Product, Smartphone
+from src.classes import Category, LawnGrass, Smartphone
+# from src.classes import Product
 
 
 def main_16_1() -> None:
