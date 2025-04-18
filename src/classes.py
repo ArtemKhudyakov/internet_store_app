@@ -1,4 +1,4 @@
-from typing import Iterator, List, Optional
+from typing import Any, Iterator, List, Optional
 
 
 class Product:
@@ -112,7 +112,7 @@ class Category:
             products_str += f"{str(product)}\n"
         return products_str
 
-    def add_product(self, product: Product) -> None:
+    def add_product(self, product: Product | Any) -> None:
         if isinstance(product, Product) or issubclass(product.__class__, Product):
             name_list = [prd.name for prd in self.__products]
             if product.name in name_list:
@@ -150,36 +150,54 @@ class CatIter:
 
 class Smartphone(Product):
 
-    def __init__(self, name: str, description: str, price: float, quantity: int, efficiency: float, model: str,
-                 memory: int, color: str) -> None:
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        efficiency: float,
+        model: str,
+        memory: int,
+        color: str,
+    ) -> None:
         super().__init__(name, description, price, quantity)
         self.efficiency = efficiency
         self.model = model
         self.memory = memory
         self.color = color
 
-    def __add__(self, other: "Smartphone") -> float:
+    def __add__(self, other: "Product") -> float:
         if type(other) is Smartphone:
-            summa = self.price * other.quantity + other.price * other.quantity
+            summa = self.price * self.quantity + other.price * other.quantity
             return summa
         else:
             raise TypeError("Неверный тип данных")
 
 
 class LawnGrass(Product):
-    def __init__(self, name: str, description: str, price: float, quantity: int, country: str,
-                 germination_period: str, color: str) -> None:
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        country: str,
+        germination_period: str,
+        color: str,
+    ) -> None:
         super().__init__(name, description, price, quantity)
         self.country = country
         self.germination_period = germination_period
         self.color = color
 
-    def __add__(self, other: "LawnGrass") -> float:
+    def __add__(self, other: "Product") -> float:
         if type(other) is LawnGrass:
-            summa = self.price * other.quantity + other.price * other.quantity
+            summa = self.price * self.quantity + other.price * other.quantity
             return summa
         else:
             raise TypeError("Неверный тип данных")
+
 
 # Код для проверки
 # if __name__ == "__main__":

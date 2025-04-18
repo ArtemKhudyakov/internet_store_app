@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.classes import Category, CatIter, Product
+from src.classes import Category, CatIter, LawnGrass, Product, Smartphone
 
 
 class TestProduct(unittest.TestCase):
@@ -384,3 +384,59 @@ def test_iterator_with_2_products(sample_category: Category, another_product: Pr
     assert str(next(iter_1)) == str(another_product)
     with pytest.raises(StopIteration):
         next(iter_1)
+
+
+def test_smartphone_creation(smartphone1: Smartphone) -> None:
+    smartphone = smartphone1
+    assert smartphone.name == "Samsung Galaxy S23 Ultra"
+    assert smartphone.description == "256GB, Серый цвет, 200MP камера"
+    assert smartphone.price == 180000
+    assert smartphone.quantity == 5
+    assert smartphone.efficiency == 95.5
+    assert smartphone.memory == 256
+    assert smartphone.model == "S23 Ultra"
+    assert smartphone.color == "Серый"
+
+
+def test_lowngrass_creation(lawn_grass1: LawnGrass) -> None:
+    lawn_grass = lawn_grass1
+    assert lawn_grass.name == "Газонная трава"
+    assert lawn_grass.description == "Элитная трава для газона"
+    assert lawn_grass.price == 500
+    assert lawn_grass.quantity == 20
+    assert lawn_grass.country == "Россия"
+    assert lawn_grass.germination_period == "7 дней"
+    assert lawn_grass.color == "Зеленый"
+
+
+def test_addition(
+    lawn_grass1: LawnGrass, smartphone1: Smartphone, lawn_grass2: LawnGrass, smartphone2: Smartphone
+) -> None:
+    smartphone_1 = smartphone1
+    lawn_grass_1 = lawn_grass1
+    smartphone_2 = smartphone2
+    lawn_grass_2 = lawn_grass2
+    with pytest.raises(TypeError):
+        assert smartphone_1 + lawn_grass_2
+    with pytest.raises(TypeError):
+        assert lawn_grass_1 + smartphone_2
+    assert smartphone_1 + smartphone_2 == 2580000
+    assert lawn_grass_1 + lawn_grass_2 == 16750
+
+
+def test_add_to_category(
+    lawn_grass1: LawnGrass, smartphone1: Smartphone, lawn_grass2: LawnGrass, smartphone2: Smartphone
+) -> None:
+    smartphone_1 = smartphone1
+    lawn_grass_1 = lawn_grass1
+    smartphone_2 = smartphone2
+    lawn_grass_2 = lawn_grass2
+    category_smartphones = Category("Смартфоны", "Высокотехнологичные смартфоны", [smartphone_1])
+    assert category_smartphones.quantity_of_items_in_category == 5
+    category_grass = Category("Газонная трава", "Различные виды газонной травы", [lawn_grass_1])
+    category_smartphones.add_product(smartphone_2)
+    assert category_smartphones.quantity_of_items_in_category == 13
+    category_grass.add_product(lawn_grass_2)
+    assert category_grass.quantity_of_items_in_category == 35
+    with pytest.raises(TypeError):
+        category_grass.add_product("Not a product")
