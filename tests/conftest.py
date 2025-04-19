@@ -2,7 +2,7 @@ from typing import Any, Dict, List
 
 import pytest
 
-from src.classes import Category, Product
+from src.classes import Category, LawnGrass, Product, Smartphone
 
 
 @pytest.fixture
@@ -86,3 +86,29 @@ def list_of_products2() -> List[Product]:
     product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
     list_of_products = [product1, product2, product3]
     return list_of_products
+
+
+@pytest.fixture
+def smartphone1() -> Smartphone:
+    smartphone = Smartphone(
+        "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый"
+    )
+    return smartphone
+
+
+@pytest.fixture
+def lawn_grass1() -> LawnGrass:
+    lawngrass = LawnGrass("Газонная трава", "Элитная трава для газона", 500.0, 20, "Россия", "7 дней", "Зеленый")
+    return lawngrass
+
+
+@pytest.fixture
+def smartphone2() -> Smartphone:
+    smartphone = Smartphone("Iphone 15", "512GB, Gray space", 210000.0, 8, 98.2, "15", 512, "Gray space")
+    return smartphone
+
+
+@pytest.fixture
+def lawn_grass2() -> LawnGrass:
+    lawn_grass = LawnGrass("Газонная трава 2", "Выносливая трава", 450.0, 15, "США", "5 дней", "Темно-зеленый")
+    return lawn_grass

@@ -15,6 +15,39 @@ description	str	    Описание
 price	    float	Цена
 quantity	int	    Количество на складе
 
+#### Подкласс Smartphone
+Родительский класс Product
+```python```
+Copy:
+`def __init__(self, name: str, description: str, price: float, quantity: int, efficiency: float, model: str,
+              memory: int, color: str)`
+Атрибут	    Тип	    Описание
+name	    str	    Название товара
+description	str	    Описание
+price	    float	Цена
+quantity	int	    Количество на складе
+efficiency  float   Эффективность смартфона
+model       str     Модель смартфона
+memory      int     Объем памяти внутреннего накопителя
+color       str     цвет смартфона
+
+
+#### Подкласс LawnGrass
+Родительский класс Product
+```python```
+Copy:
+`def __init__(self, name: str, description: str, price: float, quantity: int, country: str, germination_period: str,
+        color: str,)`
+Атрибут	            Тип	    Описание
+name	            str	    Название товара
+description	        str	    Описание
+price	            float	Цена
+quantity	        int	    Количество на складе
+country             str     Страна производства
+germination_period  str     время прорастания
+color               str     цвет травы
+
+
 
 ### Класс Category
 Атрибуты:
@@ -33,6 +66,14 @@ products	 List[Product]	Список товаров
 category_count: int - счетчик категорий
 
 product_count: int - счетчик товаров
+
+### Класс CatIter
+Класс, позволяющий итерировать объекты списка продуктов класса Category
+
+```python```
+Copy
+` def __init__(self, category: Category) -> None:`
+
 
 ## Модуль data_reader
 
