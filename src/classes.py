@@ -1,13 +1,17 @@
 from typing import Any, Iterator, List, Optional
 
+from src.base_classes import BaseProduct
+from src.mixin_classes import MixinPrint
 
-class Product:
+
+class Product(BaseProduct, MixinPrint):
     # name: str
     # description: str
     # price: float
     # quantity: int
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
+
         self.name = name
         self.description = description
 
@@ -18,6 +22,7 @@ class Product:
         if not isinstance(quantity, int) or quantity < 0:
             raise ValueError("Количество должно быть целым неотрицательным числом")
         self.quantity = quantity
+        super().__init__()
 
     def __repr__(self) -> str:
         return f"Product(name='{self.name}', price={self.price}, quantity={self.quantity})"

@@ -251,7 +251,7 @@ def test_price_setter_invalid_price(
 ) -> None:
     """Тест сеттера цены, тестирование вывода сообщения при установке невалидных цен"""
     sample_product.price = new_price
-    assert capsys.readouterr().out.strip() == message
+    assert capsys.readouterr().out.strip().split("\n")[-1] == message
 
 
 @pytest.mark.parametrize(
