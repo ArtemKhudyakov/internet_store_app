@@ -137,6 +137,16 @@ class Category:
         else:
             raise TypeError("Неверный тип данных")
 
+    def middle_price(self):
+        mid_price = 0
+        try:
+            sum_prise_of_all_products_in_category = sum(product.price*product.quantity for product in self.__products)
+            mid_price = sum_prise_of_all_products_in_category / self.quantity_of_items_in_category
+        except ZeroDivisionError as zde:
+            mid_price = 0
+        finally:
+            return round(mid_price, 2)
+
 
 class CatIter:
     def __init__(self, category: Category) -> None:
