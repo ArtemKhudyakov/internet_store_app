@@ -19,9 +19,12 @@ class Product(BaseProduct, MixinPrint):
             raise ValueError("Цена должна быть положительным числом")
         self.__price = float(price)
 
-        if not isinstance(quantity, int) or quantity < 0:
-            raise ValueError("Количество должно быть целым неотрицательным числом")
-        self.quantity = quantity
+        if not isinstance(quantity, int):
+            raise ValueError("Количество должно быть целым числом")
+        elif quantity <= 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
+        else:
+            self.quantity = quantity
         super().__init__()
 
     def __repr__(self) -> str:
