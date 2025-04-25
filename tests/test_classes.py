@@ -3,6 +3,7 @@ from typing import Any, List, Optional, Type
 from unittest.mock import patch
 
 import pytest
+from pytest import CaptureFixture
 
 from src.classes import Category, CatIter, LawnGrass, Product, Smartphone
 
@@ -19,8 +20,9 @@ class TestProduct(unittest.TestCase):
 
     def test_product_zero_quantity(self) -> None:
         """Тест создания продукта с нулевым количеством"""
-        product = Product("Книга", "Интересная книга", 19.99, 0)
-        self.assertEqual(product.quantity, 0)
+        with pytest.raises(ValueError):
+            product = Product("Книга", "Интересная книга", 19.99, 0)
+            product
 
     def test_product_negative_price(self) -> None:
         """Тест создания продукта с отрицательной ценой (должна вызывать ошибку)"""
@@ -66,7 +68,7 @@ class TestCategory(unittest.TestCase):
     [
         # Корректные данные (без ошибки)
         ("Ноутбук", "Мощный ноутбук", 999.99, 5, None),
-        ("Книга", "Интересная книга", 19.99, 0, None),  # Количество = 0 допустимо
+        ("Книга", "Интересная книга", 19.99, 0, ValueError),  # Количество = 0 недопустимо
         # Неправильная цена (должен вызывать `ValueError`)
         ("Товар", "Описание", -100.0, 5, ValueError),
         ("Товар", "Описание", "сто", 5, ValueError),  # Строка вместо числа
@@ -440,3 +442,55 @@ def test_add_to_category(
     assert category_grass.quantity_of_items_in_category == 35
     with pytest.raises(TypeError):
         category_grass.add_product("Not a product")
+
+
+def test_middle_price_of_category(smartphone1: Smartphone, smartphone2: Smartphone, empty_category: Category) -> None:
+    category1 = Category("Смартфоны", "Высокотехнологичные смартфоны", [smartphone1, smartphone2])
+    assert round(category1.middle_price(), 2) == 198461.54
+    assert empty_category.middle_price() == 0
+
+
+def test_new_product_zero_quantity(capsys: CaptureFixture) -> None:
+    product1 = Product.new_product(
+        {
+            "name": "Samsung Galaxy S23 Ultra",
+            "description": "256GB, Серый цвет, 200MP камера",
+            "price": 170000,
+            "quantity": 0,
+        }
+    )
+    product1
+    captured = capsys.readouterr()
+    output = captured.out.splitlines()
+    assert output[-2].strip() == "Нельзя создать продукт с нулевым количеством"
+    assert output[-1].strip() == "Обработка операции создания продукта завершена"
+
+
+def test_new_product_messages(capsys: CaptureFixture) -> None:
+    product1 = Product.new_product(
+        {
+            "name": "Samsung Galaxy S23 Ultra",
+            "description": "256GB, Серый цвет, 200MP камера",
+            "price": 170000,
+            "quantity": 5,
+        }
+    )
+    captured = capsys.readouterr()
+    output = captured.out.splitlines()
+    assert output[-2].strip() == "Продукт успешно создан"
+    assert output[-1].strip() == "Обработка операции создания продукта завершена"
+    list1 = [product1]
+    product2 = Product.new_product(
+        {
+            "name": "Samsung Galaxy S23 Ultra",
+            "description": "256GB, Серый цвет, 200MP камера",
+            "price": 120000,
+            "quantity": 2,
+        },
+        list1,
+    )
+    assert product2.price == 170000
+    captured = capsys.readouterr()
+    output = captured.out.splitlines()
+    assert output[-2].strip() == "Продукт уже находится в списке товаров, данные по продукту обновлены"
+    assert output[-1].strip() == "Обработка операции создания продукта завершена"
