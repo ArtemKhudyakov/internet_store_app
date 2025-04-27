@@ -42,7 +42,7 @@ class Product(BaseProduct, MixinPrint):
             raise TypeError("Неверный тип данных")
 
     @classmethod
-    def new_product(cls, data: dict, products_list: Optional[List["Product"]] = None) -> "Product":
+    def new_product(cls, data: dict, products_list: Optional[List["Product"]] = None) -> Optional["Product"]:
         if not isinstance(data, dict):
             raise ValueError("Неверный формат")
         elif data == {} or data is None:
@@ -54,6 +54,7 @@ class Product(BaseProduct, MixinPrint):
                     raise ZeroQuantityProductError("Нельзя создать продукт с нулевым количеством")
             except ZeroQuantityProductError as zqpe:
                 print(zqpe)
+                return None
             else:
                 product = Product(**data)
                 if products_list is None:
@@ -150,8 +151,8 @@ class Category:
         else:
             raise TypeError("Неверный тип данных")
 
-    def middle_price(self)->float:
-        mid_price = 0
+    def middle_price(self) -> float:
+        mid_price = 0.0
         try:
             sum_prise_of_all_products_in_category = sum(
                 product.price * product.quantity for product in self.__products

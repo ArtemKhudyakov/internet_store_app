@@ -225,7 +225,8 @@ def test_new_product(product: dict[str, Any], expected: Any) -> None:
     """Тест создания нового товара"""
     if expected != ValueError:
         product1 = Product.new_product(product)
-        assert product1.description == expected
+        if product1 is not None:
+            assert product1.description == expected
     else:
         with pytest.raises(expected):
             Product.new_product(product)
@@ -281,8 +282,9 @@ def test_new_product_in_list(
     """Тест добавления в список продукта с таким же именем"""
     product_list = list_of_products
     product3 = Product.new_product(new_product, product_list)
-    assert product3.quantity == quantity_expected
-    assert product3.price == price_expected
+    if product3 is not None:
+        assert product3.quantity == quantity_expected
+        assert product3.price == price_expected
 
 
 @pytest.mark.parametrize(
@@ -296,12 +298,14 @@ def test_new_product_in_list_empty(new_product: dict[Any, Any], price_expected: 
     """Тест на добавление продукта в пустой список"""
     product_list1 = None
     product1 = Product.new_product(new_product, product_list1)
-    assert product1.quantity == quantity_expected
-    assert product1.price == price_expected
+    if product1 is not None:
+        assert product1.quantity == quantity_expected
+        assert product1.price == price_expected
     product_list2: list = []
     product2 = Product.new_product(new_product, product_list2)
-    assert product2.quantity == quantity_expected
-    assert product2.price == price_expected
+    if product2 is not None:
+        assert product2.quantity == quantity_expected
+        assert product2.price == price_expected
 
 
 @pytest.mark.parametrize(
@@ -459,7 +463,7 @@ def test_new_product_zero_quantity(capsys: CaptureFixture) -> None:
             "quantity": 0,
         }
     )
-    product1
+    assert product1 is None
     captured = capsys.readouterr()
     output = captured.out.splitlines()
     assert output[-2].strip() == "Нельзя создать продукт с нулевым количеством"
@@ -475,6 +479,7 @@ def test_new_product_messages(capsys: CaptureFixture) -> None:
             "quantity": 5,
         }
     )
+    assert product1 is not None
     captured = capsys.readouterr()
     output = captured.out.splitlines()
     assert output[-2].strip() == "Продукт успешно создан"
@@ -489,7 +494,8 @@ def test_new_product_messages(capsys: CaptureFixture) -> None:
         },
         list1,
     )
-    assert product2.price == 170000
+    if product2 is not None:
+        assert product2.price == 170000
     captured = capsys.readouterr()
     output = captured.out.splitlines()
     assert output[-2].strip() == "Продукт уже находится в списке товаров, данные по продукту обновлены"

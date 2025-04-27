@@ -1,6 +1,5 @@
 from src.classes import Category, Product
 
-
 # def main_16_1() -> None:
 #     smartphone1 = Smartphone(
 #         "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый"
@@ -140,7 +139,7 @@ from src.classes import Category, Product
 #     main_16_2()
 
 
-def main_17_1()-> None:
+def main_17_1() -> None:
     try:
         product_invalid = Product("Бракованный товар", "Неверное количество", 1000.0, 0)
         product_invalid
@@ -152,8 +151,7 @@ def main_17_1()-> None:
     else:
         print("Не возникла ошибка ValueError при попытке добавить продукт с нулевым количеством")
 
-    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера",
-                       180000.0, 5)
+    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
     product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
     product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
 
