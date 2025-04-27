@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pytest
 from pytest import CaptureFixture
 
-from src.classes import Category, CatIter, LawnGrass, Product, Smartphone, Order
+from src.classes import Category, CatIter, LawnGrass, Order, Product, Smartphone
 
 
 class TestProduct(unittest.TestCase):
@@ -502,28 +502,31 @@ def test_new_product_messages(capsys: CaptureFixture) -> None:
     assert output[-1].strip() == "Обработка операции создания продукта завершена"
 
 
-def test_order_init(sample_product:Product)-> None:
+def test_order_init(sample_product: Product) -> None:
     Order._next_order_number = 1
     order1 = Order(sample_product, 2)
     assert order1.order_number == 1
-    assert order1.product == 'Продукт: Телефон, цена: 599.99 руб. В заказе: 2 шт.'
+    assert order1.product == "Продукт: Телефон, цена: 599.99 руб. В заказе: 2 шт."
     assert order1.total_price == 1199.98
     assert order1.quantity == 2
-    assert order1.is_confirmed == False
+    assert order1.is_confirmed is False
 
-def test_order_init_zero_quantity(sample_product: Product)-> None:
+
+def test_order_init_zero_quantity(sample_product: Product) -> None:
     with pytest.raises(ValueError):
         Order(sample_product, 0)
 
-def test_order_confirmation(sample_product) -> None:
+
+def test_order_confirmation(sample_product: Product) -> None:
     Order._next_order_number = 1
     order1 = Order(sample_product, 2)
-    assert order1.is_confirmed == False
+    assert order1.is_confirmed is False
     order1.confirm()
-    assert order1.is_confirmed == True
+    assert order1.is_confirmed is True
     assert sample_product.quantity == 8
 
-def test_order_canceling(sample_product: Product)-> None:
+
+def test_order_canceling(sample_product: Product) -> None:
     Order._next_order_number = 1
     order1 = Order(sample_product, 2)
     assert sample_product.quantity == 10
@@ -532,21 +535,24 @@ def test_order_canceling(sample_product: Product)-> None:
     order1.cancel()
     assert sample_product.quantity == 10
 
-def test_order_repr(sample_product: Product)-> None:
+
+def test_order_repr(sample_product: Product) -> None:
     Order._next_order_number = 1
     order1 = Order(sample_product, 2)
-    assert order1.__repr__()=="Order(order_number=1, product=Телефон, quantity=2, status=не подтвержден)"
+    assert order1.__repr__() == "Order(order_number=1, product=Телефон, quantity=2, status=не подтвержден)"
     order1.confirm()
-    assert repr(order1)=="Order(order_number=1, product=Телефон, quantity=2, status=подтвержден)"
+    assert repr(order1) == "Order(order_number=1, product=Телефон, quantity=2, status=подтвержден)"
 
-def test_order_str(sample_product: Product)-> None:
+
+def test_order_str(sample_product: Product) -> None:
     Order._next_order_number = 1
     order1 = Order(sample_product, 2)
-    assert str(order1) == 'Заказ #1 не подтвержден: Телефон, 2 шт. × 599.99 руб. = 1199.98 руб.'
+    assert str(order1) == "Заказ #1 не подтвержден: Телефон, 2 шт. × 599.99 руб. = 1199.98 руб."
     order1.confirm()
-    assert str(order1) == 'Заказ #1 подтвержден: Телефон, 2 шт. × 599.99 руб. = 1199.98 руб.'
+    assert str(order1) == "Заказ #1 подтвержден: Телефон, 2 шт. × 599.99 руб. = 1199.98 руб."
 
-def test_order_add_product(sample_product: Product)-> None:
+
+def test_order_add_product(sample_product: Product) -> None:
     Order._next_order_number = 1
     order1 = Order(sample_product, 2)
     order1.add_product(3)
@@ -557,7 +563,8 @@ def test_order_add_product(sample_product: Product)-> None:
     # with pytest.raises(ValueError):
     #     order1.add_product(4)
 
-def test_order_lack_of_product(sample_product: Product)-> None:
+
+def test_order_lack_of_product(sample_product: Product) -> None:
     Order._next_order_number = 1
     order1 = Order(sample_product, 11)
     with pytest.raises(ValueError):
@@ -568,7 +575,7 @@ def test_order_lack_of_product(sample_product: Product)-> None:
         order2.confirm()
 
 
-def test_order_add_negative_quantity(sample_product: Product, capsys: CaptureFixture)-> None:
+def test_order_add_negative_quantity(sample_product: Product, capsys: CaptureFixture) -> None:
     Order._next_order_number = 1
     order1 = Order(sample_product, 2)
     order1.add_product(-1)
@@ -580,17 +587,7 @@ def test_order_add_negative_quantity(sample_product: Product, capsys: CaptureFix
     captured = capsys.readouterr()
     output = captured.out.strip()
     assert order1.quantity == 2
-    assert output == ("Добавляемое количество товара в заказ должно быть больше ноля"
-                      "\nОперация добавления товара в заказ завершена")
-
-
-
-
-
-
-
-
-
-
-
-
+    assert output == (
+        "Добавляемое количество товара в заказ должно быть больше ноля"
+        "\nОперация добавления товара в заказ завершена"
+    )

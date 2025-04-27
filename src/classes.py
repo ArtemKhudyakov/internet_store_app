@@ -1,6 +1,6 @@
 from typing import Any, Iterator, List, Optional
 
-from src.base_classes import BaseProduct, BaseEntity
+from src.base_classes import BaseEntity, BaseProduct
 from src.exceptions import ZeroQuantityProductError
 from src.mixin_classes import MixinPrint
 
@@ -252,15 +252,19 @@ class Order(BaseEntity):
 
     def __repr__(self) -> str:
         status = "подтвержден" if self._confirmed else "не подтвержден"
-        return (f"Order(order_number={self._order_number}, "
-                f"product={self._product.name}, "
-                f"quantity={self._quantity}, status={status})")
+        return (
+            f"Order(order_number={self._order_number}, "
+            f"product={self._product.name}, "
+            f"quantity={self._quantity}, status={status})"
+        )
 
     def __str__(self) -> str:
         status = "подтвержден" if self._confirmed else "не подтвержден"
-        return (f"Заказ #{self._order_number} {status}: {self._product.name}, "
-                f"{self._quantity} шт. × {self._product.price} руб. = "
-                f"{self._total_price:.2f} руб.")
+        return (
+            f"Заказ #{self._order_number} {status}: {self._product.name}, "
+            f"{self._quantity} шт. × {self._product.price} руб. = "
+            f"{self._total_price:.2f} руб."
+        )
 
     def add_product(self, additional_quantity: int) -> None:
         """Увеличивает количество товара в заказе"""
@@ -289,7 +293,9 @@ class Order(BaseEntity):
 
         if self._product.quantity < self._quantity:
             raise ValueError(
-                f"Недостаточно товара '{self._product.name}' на складе. Доступно: {self._product.quantity}, требуется: {self._quantity}")
+                f"Недостаточно товара '{self._product.name}' на складе. Доступно: {self._product.quantity}, "
+                f"требуется: {self._quantity}"
+            )
 
         self._product.quantity -= self._quantity
         self._confirmed = True
@@ -301,9 +307,7 @@ class Order(BaseEntity):
 
         self._confirmed = False
         self._quantity = 0
-        self._total_price =0
-
-
+        self._total_price = 0
 
     @property
     def order_number(self) -> int:

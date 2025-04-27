@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any
-# from src.classes import Product
+
+# # from src.classes import Product
+# if TYPE_CHECKING: from src.classes import Product
 
 
 class BaseProduct(ABC):
@@ -44,4 +46,3 @@ class BaseEntity(ABC):
     def add_product(self, product) -> None:
         """Добавление продукта в сущность"""
         pass
-
