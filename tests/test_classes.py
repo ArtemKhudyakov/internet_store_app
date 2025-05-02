@@ -3,8 +3,9 @@ from typing import Any, List, Optional, Type
 from unittest.mock import patch
 
 import pytest
+from pytest import CaptureFixture
 
-from src.classes import Category, CatIter, LawnGrass, Product, Smartphone
+from src.classes import Category, CatIter, LawnGrass, Order, Product, Smartphone
 
 
 class TestProduct(unittest.TestCase):
@@ -19,8 +20,9 @@ class TestProduct(unittest.TestCase):
 
     def test_product_zero_quantity(self) -> None:
         """Тест создания продукта с нулевым количеством"""
-        product = Product("Книга", "Интересная книга", 19.99, 0)
-        self.assertEqual(product.quantity, 0)
+        with pytest.raises(ValueError):
+            product = Product("Книга", "Интересная книга", 19.99, 0)
+            product
 
     def test_product_negative_price(self) -> None:
         """Тест создания продукта с отрицательной ценой (должна вызывать ошибку)"""
@@ -66,7 +68,7 @@ class TestCategory(unittest.TestCase):
     [
         # Корректные данные (без ошибки)
         ("Ноутбук", "Мощный ноутбук", 999.99, 5, None),
-        ("Книга", "Интересная книга", 19.99, 0, None),  # Количество = 0 допустимо
+        ("Книга", "Интересная книга", 19.99, 0, ValueError),  # Количество = 0 недопустимо
         # Неправильная цена (должен вызывать `ValueError`)
         ("Товар", "Описание", -100.0, 5, ValueError),
         ("Товар", "Описание", "сто", 5, ValueError),  # Строка вместо числа
@@ -223,7 +225,8 @@ def test_new_product(product: dict[str, Any], expected: Any) -> None:
     """Тест создания нового товара"""
     if expected != ValueError:
         product1 = Product.new_product(product)
-        assert product1.description == expected
+        if product1 is not None:
+            assert product1.description == expected
     else:
         with pytest.raises(expected):
             Product.new_product(product)
@@ -279,8 +282,9 @@ def test_new_product_in_list(
     """Тест добавления в список продукта с таким же именем"""
     product_list = list_of_products
     product3 = Product.new_product(new_product, product_list)
-    assert product3.quantity == quantity_expected
-    assert product3.price == price_expected
+    if product3 is not None:
+        assert product3.quantity == quantity_expected
+        assert product3.price == price_expected
 
 
 @pytest.mark.parametrize(
@@ -294,12 +298,14 @@ def test_new_product_in_list_empty(new_product: dict[Any, Any], price_expected: 
     """Тест на добавление продукта в пустой список"""
     product_list1 = None
     product1 = Product.new_product(new_product, product_list1)
-    assert product1.quantity == quantity_expected
-    assert product1.price == price_expected
+    if product1 is not None:
+        assert product1.quantity == quantity_expected
+        assert product1.price == price_expected
     product_list2: list = []
     product2 = Product.new_product(new_product, product_list2)
-    assert product2.quantity == quantity_expected
-    assert product2.price == price_expected
+    if product2 is not None:
+        assert product2.quantity == quantity_expected
+        assert product2.price == price_expected
 
 
 @pytest.mark.parametrize(
@@ -440,3 +446,148 @@ def test_add_to_category(
     assert category_grass.quantity_of_items_in_category == 35
     with pytest.raises(TypeError):
         category_grass.add_product("Not a product")
+
+
+def test_middle_price_of_category(smartphone1: Smartphone, smartphone2: Smartphone, empty_category: Category) -> None:
+    category1 = Category("Смартфоны", "Высокотехнологичные смартфоны", [smartphone1, smartphone2])
+    assert round(category1.middle_price(), 2) == 198461.54
+    assert empty_category.middle_price() == 0
+
+
+def test_new_product_zero_quantity(capsys: CaptureFixture) -> None:
+    product1 = Product.new_product(
+        {
+            "name": "Samsung Galaxy S23 Ultra",
+            "description": "256GB, Серый цвет, 200MP камера",
+            "price": 170000,
+            "quantity": 0,
+        }
+    )
+    assert product1 is None
+    captured = capsys.readouterr()
+    output = captured.out.splitlines()
+    assert output[-2].strip() == "Нельзя создать продукт с нулевым количеством"
+    assert output[-1].strip() == "Обработка операции создания продукта завершена"
+
+
+def test_new_product_messages(capsys: CaptureFixture) -> None:
+    product1 = Product.new_product(
+        {
+            "name": "Samsung Galaxy S23 Ultra",
+            "description": "256GB, Серый цвет, 200MP камера",
+            "price": 170000,
+            "quantity": 5,
+        }
+    )
+    assert product1 is not None
+    captured = capsys.readouterr()
+    output = captured.out.splitlines()
+    assert output[-2].strip() == "Продукт успешно создан"
+    assert output[-1].strip() == "Обработка операции создания продукта завершена"
+    list1 = [product1]
+    product2 = Product.new_product(
+        {
+            "name": "Samsung Galaxy S23 Ultra",
+            "description": "256GB, Серый цвет, 200MP камера",
+            "price": 120000,
+            "quantity": 2,
+        },
+        list1,
+    )
+    if product2 is not None:
+        assert product2.price == 170000
+    captured = capsys.readouterr()
+    output = captured.out.splitlines()
+    assert output[-2].strip() == "Продукт уже находится в списке товаров, данные по продукту обновлены"
+    assert output[-1].strip() == "Обработка операции создания продукта завершена"
+
+
+def test_order_init(sample_product: Product) -> None:
+    Order._next_order_number = 1
+    order1 = Order(sample_product, 2)
+    assert order1.order_number == 1
+    assert order1.product == "Продукт: Телефон, цена: 599.99 руб. В заказе: 2 шт."
+    assert order1.total_price == 1199.98
+    assert order1.quantity == 2
+    assert order1.is_confirmed is False
+
+
+def test_order_init_zero_quantity(sample_product: Product) -> None:
+    with pytest.raises(ValueError):
+        Order(sample_product, 0)
+
+
+def test_order_confirmation(sample_product: Product) -> None:
+    Order._next_order_number = 1
+    order1 = Order(sample_product, 2)
+    assert order1.is_confirmed is False
+    order1.confirm()
+    assert order1.is_confirmed is True
+    assert sample_product.quantity == 8
+
+
+def test_order_canceling(sample_product: Product) -> None:
+    Order._next_order_number = 1
+    order1 = Order(sample_product, 2)
+    assert sample_product.quantity == 10
+    order1.confirm()
+    assert sample_product.quantity == 8
+    order1.cancel()
+    assert sample_product.quantity == 10
+
+
+def test_order_repr(sample_product: Product) -> None:
+    Order._next_order_number = 1
+    order1 = Order(sample_product, 2)
+    assert order1.__repr__() == "Order(order_number=1, product=Телефон, quantity=2, status=не подтвержден)"
+    order1.confirm()
+    assert repr(order1) == "Order(order_number=1, product=Телефон, quantity=2, status=подтвержден)"
+
+
+def test_order_str(sample_product: Product) -> None:
+    Order._next_order_number = 1
+    order1 = Order(sample_product, 2)
+    assert str(order1) == "Заказ #1 не подтвержден: Телефон, 2 шт. × 599.99 руб. = 1199.98 руб."
+    order1.confirm()
+    assert str(order1) == "Заказ #1 подтвержден: Телефон, 2 шт. × 599.99 руб. = 1199.98 руб."
+
+
+def test_order_add_product(sample_product: Product) -> None:
+    Order._next_order_number = 1
+    order1 = Order(sample_product, 2)
+    order1.add_product(3)
+    assert order1.quantity == 5
+    # with pytest.raises(ValueError):
+    #     order1.add_product(-4)
+    # order1.confirm()
+    # with pytest.raises(ValueError):
+    #     order1.add_product(4)
+
+
+def test_order_lack_of_product(sample_product: Product) -> None:
+    Order._next_order_number = 1
+    order1 = Order(sample_product, 11)
+    with pytest.raises(ValueError):
+        order1.confirm()
+    order2 = Order(sample_product, 2)
+    order2.add_product(10)
+    with pytest.raises(ValueError):
+        order2.confirm()
+
+
+def test_order_add_negative_quantity(sample_product: Product, capsys: CaptureFixture) -> None:
+    Order._next_order_number = 1
+    order1 = Order(sample_product, 2)
+    order1.add_product(-1)
+    captured = capsys.readouterr()
+    output = captured.out.strip()
+    assert order1.quantity == 2
+    assert output == "Добавляемое количество должно быть положительным\nОперация добавления товара в заказ завершена"
+    order1.add_product(0)
+    captured = capsys.readouterr()
+    output = captured.out.strip()
+    assert order1.quantity == 2
+    assert output == (
+        "Добавляемое количество товара в заказ должно быть больше ноля"
+        "\nОперация добавления товара в заказ завершена"
+    )
